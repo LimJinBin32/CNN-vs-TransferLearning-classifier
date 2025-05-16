@@ -28,14 +28,20 @@ To design, build, and evaluate deep learning models capable of performing accura
 
 ---
 
-## 🏗️ Project Structure
-
-- **Data Preparation**: Image preprocessing, resizing, normalization
-- **Model 1 – CNN**: Custom CNN with regularization (Dropout, BatchNorm, L2)
-- **Model 2 – Transfer Learning**: Tested MobileNetV2, DenseNet121, and InceptionV3
-- **Final Model**: Fine-tuned InceptionV3 selected for best performance
-- **Evaluation**: Accuracy, Precision, Recall, F1-score, AUC
-- **Comparison**: Discussed results, pros/cons, and final recommendation
+## 🗂️ Project Structure
+```
+T2_221128Z_EGT214_PROJECT.ipynb
+├── Data Preprocessing
+├── CNN Model
+│ └── Architecture, Training, Regularization
+├── Summary of CNN Model
+├── Transfer Learning
+│ └── MobileNetV2, DenseNet121, InceptionV3 Trials
+│ └── Final InceptionV3 Model
+│ └── Testing TL Model
+├── Summary of Transfer Learning
+├── Final Comparison of CNN vs TL
+```
 
 ---
 
