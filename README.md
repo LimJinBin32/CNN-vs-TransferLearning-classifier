@@ -24,7 +24,8 @@ To design, build, and evaluate deep learning models capable of performing accura
 
 > ⚠️ The low-resolution nature of the dataset (32x32 pixels) posed a challenge for feature extraction.
 
-![Sample dataset images](https://github.com/LimJinBin32/CNN-vs-TransferLearning-classifier/blob/36fe7af0976e0c44c1917150c40fc43e2dae5263/Image_Batch.png?raw=true)
+![Sample dataset images](Images/Image_Batch.png)
+
 
 ---
 
@@ -54,18 +55,59 @@ T2_221128Z_EGT214_PROJECT.ipynb
 
 ---
 
-## 📊 Results Summary
+## 🏗️ Model Architecture
 
-| Model              | Accuracy | AUC Score | Notable Observations                          |
-|-------------------|----------|-----------|-----------------------------------------------|
-| Custom CNN        | ~90%     | 0.92      | Good performance, regularized, fast training  |
-| MobileNetV2       | Low      | Unstable  | Low accuracy, poor convergence                |
-| DenseNet121       | ~90%     | 0.91      | Stable, plateaued early                       |
-| InceptionV3       | Highest  | 0.94+     | Best performance, improved with fine-tuning   |
+### Custom CNN (from scratch)
+Input: **32×32×3**
 
-✅ **Final model selected**: Fine-tuned **InceptionV3**
+- **Block 1:** Conv2D(32, 3×3, same, ReLU, L2=0.001) → BatchNorm → MaxPool  
+- **Block 2:** Conv2D(64, 3×3, same, ReLU) → BatchNorm → MaxPool  
+- **Block 3:** Conv2D(128, 3×3, same, ReLU) → BatchNorm → MaxPool  
+- **Block 4:** Conv2D(256, 3×3, same, ReLU) → BatchNorm → MaxPool  
+- **Classifier:** Flatten → Dense(128, ReLU) → Dropout(0.4) → Dense(3, Softmax)
+
+### Transfer Learning Models (Baseline: frozen backbone + custom head)
+
+All TL models use:  
+**GlobalAveragePooling2D → Dense(256, ReLU) → BatchNorm → Dropout(0.3) → Dense(3, Softmax)**
+
+**Backbones (ImageNet, `include_top=False`):**
+- **MobileNetV2** (input: **224×224×3**)  
+- **DenseNet121** (input: **224×224×3**)  
+- **InceptionV3** (input: **299×299×3**)  
 
 ---
+
+## 🧪 Data Augmentation & Preprocessing
+
+- **Training set:** augmented using random rotation, shifts, horizontal flip, and zoom (model-dependent).
+- **Validation/Test set:** no augmentation (only preprocessing).
+- **Input resizing:** 32×32 images were resized to 224×224 (MobileNetV2/DenseNet121) and 299×299 (InceptionV3).
+
+## 📊 Results Summary
+
+> **Note:** For multi-class classification, the key reported metric is **validation accuracy** (generalization performance). Training accuracy is included for reference.  
+
+| Model | Approach | Train Acc | Val Acc | Total Params | Trainable Params |
+|---|---|---:|---:|---:|---:|
+| Custom CNN | From scratch | 90.52% | 88.60% | 456,131 | 455,171 |
+| MobileNetV2 | TL baseline (frozen backbone + custom head) | 89.20% | 87.73% | 2,587,715 | 329,219 |
+| DenseNet121 | TL baseline (frozen backbone + custom head) | 88.58% | 89.27% | 7,301,699 | 263,683 |
+| InceptionV3 | TL baseline (frozen backbone + custom head) | 90.83% | 93.80% | 22,329,123 | 525,827 |
+| InceptionV3 | TL fine-tuned | 94.73% | **94.60%** | 22,329,123 | 7,699,139 |
+
+**Key takeaway:** InceptionV3 achieved the strongest generalization on this dataset, outperforming the custom CNN and the other transfer learning baselines. Based on this, I selected InceptionV3 as the final model and fine-tuned the **last 50 layers**, which further improved validation performance.
+
+## 🔍 Comparison
+
+The **fine-tuned InceptionV3** delivered the best overall validation performance and generalization (lower validation loss and a smaller train–validation gap). The custom CNN was faster to train (5 s/epoch), but achieved lower validation performance. Although InceptionV3 was more computationally intensive (30–60 s/epoch), fine-tuning the last 50 layers produced the most accurate and reliable model for this task.
+
+### 📈 Training Curves (Accuracy & Loss)
+**Custom CNN:** shows steady learning but a larger train–validation gap and higher validation loss.  
+**Fine-tuned InceptionV3:** converges faster with consistently lower validation loss and a smaller train–validation gap.
+
+![CNN training curves](Images/CNN_TrainVal_AccuracyLost.png)
+![InceptionV3 fine-tuned curves](Images/InceptionV3_TrainVal_AccuracyLost.png)
 
 ## 🧠 Key Learnings
 
@@ -78,12 +120,6 @@ T2_221128Z_EGT214_PROJECT.ipynb
   - Fine-tuning pretrained models
 - Evaluated models using multiple metrics (Accuracy, AUC, F1)
 - Compared architectures to understand trade-offs
-
----
-
-## 📝 File
-
-- `T2_221128Z_EGT214_PROJECT.ipynb` – Full notebook with model building, results, and summaries
 
 ---
 
