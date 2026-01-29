@@ -45,11 +45,10 @@ T2_221128Z_EGT214_PROJECT.ipynb
 
 ---
 
-## ⚙️ Technologies Used
+## ⚙️ Tools & Libraries
 
 - Python 3
 - TensorFlow / Keras
-- Google Colab
 - Matplotlib, Seaborn (for visualization)
 - Scikit-learn (for evaluation metrics)
 
